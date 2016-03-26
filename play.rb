@@ -36,11 +36,17 @@ class BookOrder
         send_payment_failure_email
         @status = "failed"
       end
-=begin
-add another payment method such as google wallet, dwolla, skrill
-=end   
-
- elsif payment_type == :stripe
+    # Adding another payment method such as google wallet
+    elsif payment_type == :google
+      if charge_credit_card(shipping + (quantity * 14.95))
+        send_email_receipt
+        @status = "charged"
+      else
+        send_payment_failure_email
+        @status = "failed"
+      end
+    end
+    elsif payment_type == :stripe
       if charge_credit_card(shipping + (quantity * 14.95))
         send_email_receipt
         @status = "charged"
