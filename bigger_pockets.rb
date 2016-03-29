@@ -8,19 +8,34 @@
 # planning to introduce a lot of new products into the store very soon, such as
 # software and training seminars.
 
+# require helpers for money formatting
+require 'action_view'
+include ActionView::Helpers::NumberHelper
+
 # write a class for software
 class Software
   def initialize(type, quantity)
     @software_type = type
     @software_quantity = quantity
   end
+  def charge(order_type, quantity, payment_type)
+  end
 end
 
 # write a class for training seminars
-class TrainingSeminar
+class TrainingSeminarOrder
   def initialize(type, tickets)
     @seminar_type = type
     @seminar_tickets = tickets
+  end
+  def charge(type, tickets)
+    if type == :realestate
+      @ticket_price = 100
+    elsif type = :investing
+      @ticket_price = 200
+    else
+      @ticket_price = 50
+    end
   end
 end
 
@@ -30,14 +45,12 @@ class BookOrder
     @quantity = quantity
     @address = address
   end
-
   def charge(order_type, payment_type)
     if order_type == "ebook"
       shipping = 0
     else
       shipping = 5.99
     end
-
     if payment_type == :cash
       send_email_receipt
       @status = "charged"
@@ -62,25 +75,20 @@ class BookOrder
       end
     end
   end
-
   def ship(order_type)
     if order_type == "ebook"
       # [send email with download link...]
     else
       # [print shipping label]
     end
-
     @status = "shipped"
   end
-
   def quantity
     @quantity
   end
-
   def status
     @status
   end
-
   def to_s(order_type)
     if order_type == "ebook"
       shipping = 0
@@ -96,7 +104,6 @@ class BookOrder
     report
     return report
   end
-
   def shipping_cost(order_type)
     if order_type == "ebook"
       shipping = 0
@@ -104,16 +111,13 @@ class BookOrder
       shipping = 4.95
     end
   end
-
   def send_email_receipt
     # [send email receipt]
   end
-
   # In real life, charges would happen here. For sake of this test, it simply returns true
   def charge_paypal_account(amount)
     true
   end
-
   # In real life, charges would happen here. For sake of this test, it simply returns true
   def charge_credit_card(amount)
     true
@@ -125,13 +129,11 @@ class ConferenceTicketOrder
     @order_number = order_number
     @quantity = quantity
     if quantity > 1
+      # logic to see if quantity if > 1 and, if so, raise this error:
       raise 'Conference tickets are limited to one per customer'
     end
     @address = address
   end
-
-  # logic to see if quantity if > 1 and, if so, throw this error:
-  # "Conference tickets are limited to one per customer"
 
   def charge(payment_type)
     shipping = 0
@@ -155,7 +157,6 @@ class ConferenceTicketOrder
   def ship
     # [print ticket]
     # [print shipping label]
-
     @status = "shipped"
   end
 
@@ -166,9 +167,6 @@ class ConferenceTicketOrder
   def status
     @status
   end
-
-  require 'action_view'
-  include ActionView::Helpers::NumberHelper
 
   def to_s
     shipping = 0
