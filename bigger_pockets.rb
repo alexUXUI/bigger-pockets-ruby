@@ -109,12 +109,19 @@ class ConferenceTicketOrder
   def initialize(order_number, quantity, address)
     @order_number = order_number
     @quantity = quantity
+    if quantity > 1
+      raise 'Conference tickets are limited to one per customer'
+    end
     @address = address
   end
 
-  def charge(payment_type)
-    shipping = 0
+  # logic to see if quantity if > 1 and, if so, throw this error:
+  # "Conference tickets are limited to one per customer"
 
+  def charge(payment_type)
+
+
+    shipping = 0
     if payment_type == :cash
       send_email_receipt
       @status = "charged"
