@@ -8,6 +8,22 @@
 # planning to introduce a lot of new products into the store very soon, such as
 # software and training seminars.
 
+# write a class for software
+class Software
+  def initialize(type, quantity)
+    @software_type = type
+    @software_quantity = quantity
+  end
+end
+
+# write a class for training seminars
+class TrainingSeminar
+  def initialize(type, tickets)
+    @seminar_type = type
+    @seminar_tickets = tickets
+  end
+end
+
 class BookOrder
   def initialize(order_number, quantity, address)
     @order_number = order_number
@@ -71,7 +87,6 @@ class BookOrder
     else
       shipping = 4.99
     end
-
     report = "Order ##{@order_number}\n"
     report += "Ship to: #{@address.join(", ")}\n"
     report += "-----\n\n"
@@ -119,8 +134,6 @@ class ConferenceTicketOrder
   # "Conference tickets are limited to one per customer"
 
   def charge(payment_type)
-
-
     shipping = 0
     if payment_type == :cash
       send_email_receipt
@@ -154,6 +167,9 @@ class ConferenceTicketOrder
     @status
   end
 
+  require 'action_view'
+  include ActionView::Helpers::NumberHelper
+
   def to_s
     shipping = 0
     report = "Order ##{@order_number}\n"
@@ -163,7 +179,7 @@ class ConferenceTicketOrder
     report += "------|---------------------------------|------\n"
     report += "#{@quantity}     |"
     report += " Conference Ticket               |"
-    report += " $#{shipping + (quantity * 300.0)}"
+    report += " $#{number_with_precision(shipping + (quantity * 300), precision: 2)}"
     report
     return report
   end
