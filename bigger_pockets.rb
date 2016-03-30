@@ -24,18 +24,45 @@ end
 
 # write a class for training seminars
 class TrainingSeminarOrder
-  def initialize(type, tickets)
+  def initialize(type, tickets, address)
     @seminar_type = type
     @seminar_tickets = tickets
   end
   def charge(type, tickets)
     if type == :realestate
       @ticket_price = 100
-    elsif type = :investing
+      send_email_receipt
+      @status = "charged"
+    elsif type == :investing
       @ticket_price = 200
+      send_email_receipt
+      @status = "charged"
     else
       @ticket_price = 50
+      send_email_receipt
+      @status = "charged"
     end
+  end
+  def shipping_cost(order_type)
+    if order_type == "ebook"
+      shipping = 0
+    else
+      shipping = 4.95
+    end
+  end
+  def ship(order_type)
+    if order_type == "ebook"
+      # [send email with download link...]
+    else
+      # [print shipping label]
+    end
+    @status = "shipped"
+  end
+  def quantity
+    @quantity
+  end
+  def status
+    @status
   end
 end
 
