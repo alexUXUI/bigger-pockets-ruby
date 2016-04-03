@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href='https://fonts.googleapis.com/css?family=Monda' rel='stylesheet' type='text/css'>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <style>
+      body { font-family: "Monda"; background-color: rgb(243, 243, 243); padding: 0; margin: 0; }
+      img { height: 50px; width: 50px; }
+      nav { width: 100%; height: 100px; background-color: white; }
+      nav { display: flex; flex-direction: row; align-items: center; justify-content: center; }
+      .brand { width: 30%; display: flex; flex-direction: row; align-items: center; padding: 2%; }
+      .controls { width: 70%; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; padding: 2%; }
+      button { display: flex; flex-direction: row; justify-content: center; margin: 1%; border: none; color: white; height:45px; width:100px; }
+      #disconnect { background-color:tomato; }
+      #reconnect { background-color: green; }
+      .chatInput { width: 100%; height: 200px; background-color: white; display: flex; flex-direction: row; align-items: center; bottom:0; position:fixed; }
+      #chat-log > p:nth-child(even)  { background-color: white; color: rgb(30,176,252); }
+      .onBoard { width: 100%; display: flex; flex-direction: column; margin: auto; justify-content: center; text-align: center; }
+      input { border:none; border-bottom: 1px solid black; height: 50px; width: 400px; font-size: 1.5em; }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="brand">
+        <img src="https://pbs.twimg.com/profile_images/667410202174488576/yZijqBTv.png" />
+        <h1>Bigger Pockets</h1>
+      </div>
+      <div class='controls'>
+        <button id="reconnect"><i class="fa fa-angle-up"></i>Reconnect</button>
+        <button id="disconnect">Disconnect</button>
+      </div>
+    </nav>
+    <div class="onBoard">
+      <h1>Enter your name to begin chatting</h1>
+      <div id="nameForm">
+        <input type="text" id="name" placeholder="Your name">
+      </div>
+    </div>
+    <div class="container">
+      <div id="chat-log"></div>
+    </div>
+    <div class="chatInput">
+      <h1>Enter your message here:   </h1>
+      <div id="form">
+        <input type="text" id="message">
+      </div>
+    </div>
+    <script>
+      $(document).ready(function(){
+        $('.chatInput').hide();
+        $('.container').hide();
+      })
+      var socket, host;
+      host = "ws://localhost:3001";
+      function addName(){
+        var name = $("#name").val();
+        $("#chat-log").append("<p> Welcome to the chat room: " + name + "</p>");
+      }
+      $('#nameForm').keypress(function(event) {
+        if (event.keyCode == '13') {
+          addName();
+          $('.onBoard').hide();
+          $('.container').show();
+          $('.chatInput').fadeIn(300);
+        }
+      });
+      function connect() {
+        try {
+          socket = new WebSocket(host);
+          socket.onopen = function() {
+            addMessage("Connected");
+          }
+          socket.onclose = function() {
+            addMessage("Socket Status: " + socket.readyState + " (closed)");
+          }
+          socket.onmessage = function(msg) {
+            addMessage(msg.data);
+          }
+        } catch(exception) {
+          addMessage("Error: " + exception);
+        }
+      }
+      function addMessage(msg) {
+        var name = $("#name").val();
+        $("#chat-log").append("<p>" + name + ":  " + msg + "</p>");
+      }
+      function send() {
+        var text = $("#message").val();
+        if (text == '') {
+          addMessage("Enter a Message");
+          return;
+        }
+        try {
+          socket.send(text);
+        } catch(exception) {
+          addMessage("Failed To Send")
+        }
+        $("#message").val('');
+      }
+      $(function() {
+        connect();
+      });
+      $('#message').keypress(function(event) {
+        if (event.keyCode == '13') { send(); }
+      });
+      $("#disconnect").click(function() {
+        socket.close()
+      });
+      $("#reconnect").click(function() {
+        connect()
+      });
+    </script>
+  </body>
+</html>
